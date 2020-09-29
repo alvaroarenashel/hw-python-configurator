@@ -1,0 +1,6 @@
+all:
+  hosts:
+    hw-python-iamexample.apps.9dsn6bxk.westeurope.aroapp.io
+  vars:
+    ansible_connection: local
+    port: 80

@@ -1,0 +1,38 @@
+- name: Configure the remote server via REST API
+  hosts: all
+
+  tasks:
+  - name: Get the current configuration
+    uri:
+      url: http://{{inventory_hostname}}:{{port}}
+      method: GET
+      return_content: yes  
+      headers:
+        Content-Type: "text/plain"
+    register: result
+
+  - name: print
+    debug:
+      var: result.content
+
+  - name: Configure with timestamp 
+    uri:
+      url: http://{{inventory_hostname}}:{{port}}
+      method: POST
+      body: "Last configured at {{ansible_date_time.iso8601}}"
+      body_format: raw 
+      headers:
+        Content-Type: "text/plain"
+
+  - name: Get the updated configuration
+    uri:
+      url: http://{{inventory_hostname}}:{{port}}
+      method: GET
+      return_content: yes
+      headers:
+        Content-Type: "text/plain"
+    register: result 
+
+  - name: print
+    debug:
+      var: result.content
