@@ -24,6 +24,9 @@ RUN addgroup -S ansible && adduser -S ansible -G ansible -h /ansible/playbooks
 RUN echo "[local]" >> /etc/ansible/hosts && \
     echo "localhost" >> /etc/ansible/hosts
 
+RUN echo "[default]" > /etc/ansible/ansible.cfg
+RUN echo "local_tmp = /tmp" >> /etc/ansible/ansible.cfg
+
 RUN \
   curl -fsSL https://releases.ansible.com/ansible/ansible-2.2.2.0.tar.gz -o ansible.tar.gz && \
   tar -xzf ansible.tar.gz -C ansible --strip-components 1 && \
@@ -35,8 +38,6 @@ USER ansible
 WORKDIR /ansible/playbooks
 COPY . /ansible/playbooks
 
-RUN echo "[default]" > /ansible/playbooks/ansible.cfg
-RUN echo "local_tmp = /tmp" >> /ansible/playbooks/ansible.cfg
 
 ENV ANSIBLE_GATHERING smart
 ENV ANSIBLE_HOST_KEY_CHECKING false
