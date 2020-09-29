@@ -3,7 +3,6 @@ FROM gliderlabs/alpine:3.4
 RUN \
   apk-install \
     curl \
-    bash \
     openssh-client \
     python \
     py-boto \
@@ -19,6 +18,9 @@ RUN \
   rm -rf /var/cache/apk/*
 
 RUN mkdir /etc/ansible/ /ansible
+RUN mkdir -p /ansible/playbooks/tmp
+RUN addgroup -S ansible && adduser -S ansible -G ansible -h /ansible/playbooks
+
 RUN echo "[local]" >> /etc/ansible/hosts && \
     echo "localhost" >> /etc/ansible/hosts
 
@@ -27,10 +29,9 @@ RUN \
   tar -xzf ansible.tar.gz -C ansible --strip-components 1 && \
   rm -fr ansible.tar.gz /ansible/docs /ansible/examples /ansible/packaging
 
-RUN adduser -D -u 1000 -h /ansible ansible
+RUN chown ansible:ansible /ansible/playbooks
 
 USER ansible
-RUN mkdir -p /ansible/playbooks/tmp
 WORKDIR /ansible/playbooks
 COPY . /ansible/playbooks
 
@@ -47,4 +48,3 @@ ENV DEFAULT_LOCAL_TMP /ansible/playbooks/tmp
 ENTRYPOINT ["ansible-playbook","configure.yml"]
 CMD ["-i","dev.yml"]
 
-USER ansible
