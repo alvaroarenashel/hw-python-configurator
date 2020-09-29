@@ -2,6 +2,22 @@
   hosts: all
 
   tasks:
+  - name: Who am I?
+    command: whoami
+    register: who
+
+  - name: print user
+    debug:
+      var: who.stdout
+
+  - name: working dir
+    command: pwd
+    register: workingDir
+
+  - name: print workingDir
+    debug:
+      var: workingDir.stdout
+
   - name: Get the current configuration
     uri:
       url: http://{{inventory_hostname}}:{{port}}

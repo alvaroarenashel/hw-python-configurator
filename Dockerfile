@@ -3,6 +3,7 @@ FROM gliderlabs/alpine:3.4
 RUN \
   apk-install \
     curl \
+    bash \
     openssh-client \
     python \
     py-boto \
@@ -26,9 +27,12 @@ RUN \
   tar -xzf ansible.tar.gz -C ansible --strip-components 1 && \
   rm -fr ansible.tar.gz /ansible/docs /ansible/examples /ansible/packaging
 
+RUN adduser -D -u 1000 -h /ansible ansible
 RUN mkdir -p /ansible/playbooks
 WORKDIR /ansible/playbooks
 COPY . /ansible/playbooks
+
+USER ansible
 
 ENV ANSIBLE_GATHERING smart
 ENV ANSIBLE_HOST_KEY_CHECKING false
