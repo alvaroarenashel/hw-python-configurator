@@ -19,6 +19,9 @@ RUN \
 
 RUN mkdir /etc/ansible/ /ansible
 RUN mkdir -p /ansible/playbooks/tmp
+RUN mkdir -p /.ansible/tmp
+RUN chgrp -R 0 /.ansible/tmp && chmod -R g=u /.ansible/tmp
+
 RUN addgroup -S ansible && adduser -S ansible -G ansible -h /ansible/playbooks
 
 RUN echo "[local]" >> /etc/ansible/hosts && \
@@ -33,7 +36,8 @@ RUN \
   tar -xzf ansible.tar.gz -C ansible --strip-components 1 && \
   rm -fr ansible.tar.gz /ansible/docs /ansible/examples /ansible/packaging
 
-RUN chown ansible:ansible /ansible/playbooks
+RUN chown -R ansible:ansible /ansible/playbooks
+RUN chgrp -R 0 /ansible/playbooks && chmod -R g=u /ansible/playbooks
 
 USER ansible
 WORKDIR /ansible/playbooks
