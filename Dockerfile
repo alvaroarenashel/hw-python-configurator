@@ -25,7 +25,8 @@ RUN echo "[local]" >> /etc/ansible/hosts && \
     echo "localhost" >> /etc/ansible/hosts
 
 RUN echo "[default]" > /etc/ansible/ansible.cfg
-RUN echo "local_tmp = /tmp" >> /etc/ansible/ansible.cfg
+RUN echo "local_tmp = /tmp/.ansible/tmp" >> /etc/ansible/ansible.cfg
+RUN echo "remote_tmp = /tmp/.ansible/tmp" >> /etc/ansible/ansible.cfg
 
 RUN \
   curl -fsSL https://releases.ansible.com/ansible/ansible-2.2.2.0.tar.gz -o ansible.tar.gz && \
@@ -37,7 +38,7 @@ RUN chown ansible:ansible /ansible/playbooks
 USER ansible
 WORKDIR /ansible/playbooks
 COPY . /ansible/playbooks
-
+RUN mkdir -p /tmp/.ansible/tmp
 
 ENV ANSIBLE_GATHERING smart
 ENV ANSIBLE_HOST_KEY_CHECKING false
@@ -47,6 +48,7 @@ ENV ANSIBLE_SSH_PIPELINING True
 ENV PATH /ansible/bin:$PATH
 ENV PYTHONPATH /ansible/lib
 ENV DEFAULT_LOCAL_TMP /tmp
+ENV ANSIBLE_CONFIG /etc/ansible/ansible.cfg
 
 ENTRYPOINT ["ansible-playbook","configure.yml"]
 CMD ["-i","dev.yml"]
