@@ -28,11 +28,12 @@ RUN \
   rm -fr ansible.tar.gz /ansible/docs /ansible/examples /ansible/packaging
 
 RUN adduser -D -u 1000 -h /ansible ansible
-RUN mkdir -p /ansible/playbooks
+
+USER ansible
+RUN mkdir -p /ansible/playbooks/tmp
 WORKDIR /ansible/playbooks
 COPY . /ansible/playbooks
 
-USER ansible
 
 ENV ANSIBLE_GATHERING smart
 ENV ANSIBLE_HOST_KEY_CHECKING false
@@ -41,6 +42,9 @@ ENV ANSIBLE_ROLES_PATH /ansible/playbooks/roles
 ENV ANSIBLE_SSH_PIPELINING True
 ENV PATH /ansible/bin:$PATH
 ENV PYTHONPATH /ansible/lib
+ENV DEFAULT_LOCAL_TMP /ansible/playbooks/tmp
 
 ENTRYPOINT ["ansible-playbook","configure.yml"]
 CMD ["-i","dev.yml"]
+
+USER ansible
