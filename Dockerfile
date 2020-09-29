@@ -34,7 +34,7 @@ RUN chown ansible:ansible /ansible/playbooks
 USER ansible
 WORKDIR /ansible/playbooks
 COPY . /ansible/playbooks
-
+RUN echo "local_tmp = /tmp" > /ansible/playbooks/ansible.cfg
 
 ENV ANSIBLE_GATHERING smart
 ENV ANSIBLE_HOST_KEY_CHECKING false
@@ -43,7 +43,7 @@ ENV ANSIBLE_ROLES_PATH /ansible/playbooks/roles
 ENV ANSIBLE_SSH_PIPELINING True
 ENV PATH /ansible/bin:$PATH
 ENV PYTHONPATH /ansible/lib
-ENV DEFAULT_LOCAL_TMP /ansible/playbooks/tmp
+ENV DEFAULT_LOCAL_TMP /tmp
 
 ENTRYPOINT ["ansible-playbook","configure.yml"]
 CMD ["-i","dev.yml"]
