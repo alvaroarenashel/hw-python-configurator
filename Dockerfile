@@ -34,7 +34,9 @@ RUN chown ansible:ansible /ansible/playbooks
 USER ansible
 WORKDIR /ansible/playbooks
 COPY . /ansible/playbooks
-RUN echo "local_tmp = /tmp" > /ansible/playbooks/ansible.cfg
+
+RUN echo "[default]" > /ansible/playbooks/ansible.cfg
+RUN echo "local_tmp = /tmp" >> /ansible/playbooks/ansible.cfg
 
 ENV ANSIBLE_GATHERING smart
 ENV ANSIBLE_HOST_KEY_CHECKING false
