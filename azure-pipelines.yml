@@ -1,0 +1,58 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.SourceVersion)'
+  ImageName: 'hw-python-configurator'
+  azureSubscription: HKI-kanslia-standalone
+  appName: hw-python-configurator
+  containerRegistry: registry.hub.docker.com
+
+steps:
+- script: |
+      echo 'Running in workspace $(Pipeline.Workspace)'
+      echo 'Build.SourceVersion: $(Build.SourceVersion)'
+      echo 'Build.SourceVersionMessage: $(Build.SourceVersionMessage)'
+      echo 'Build.SourcesDirectory: $(Build.SourcesDirectory)'
+      echo 'Build.ArtifactStagingDirectory: $(build.artifactstagingdirectory)'
+
+- task: Docker@2
+  displayName: Build the docker image
+  inputs:
+    command: 'build'
+    Dockerfile: '**/Dockerfile'
+    tags: '$(ImageName)'
+    arguments: '-t $(ImageName)'
+
+- script: |
+    docker tag $(ImageName):latest helsinki/$(ImageName):latest
+    docker tag $(ImageName):latest helsinki/$(ImageName):$(tag)
+
+- publish: $(build.artifactstagingdirectory)
+  artifact: ContainerImages
+
+
+- task: Docker@2
+  displayName: Push image to Docker hub
+  inputs:
+    containerRegistry: Docker hub upload-profiili-tunnistus
+    repository: helsinki/$(ImageName)
+    command: push
+    tags: |
+      latest
+      $(tag)
+
+
+
+
